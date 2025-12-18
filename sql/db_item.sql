@@ -95,4 +95,38 @@ INSERT INTO `tb_user_role` VALUES (1, 1);
 INSERT INTO `tb_user_role` VALUES (1, 2);
 INSERT INTO `tb_user_role` VALUES (2, 2);
 
+-- 评价表
+DROP TABLE IF EXISTS `tb_comment`;
+CREATE TABLE `tb_comment` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '评价ID',
+  `item_id` bigint(20) NOT NULL COMMENT '商品ID',
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  `order_id` bigint(20) NOT NULL COMMENT '订单ID',
+  `content` varchar(500) NOT NULL COMMENT '评价内容',
+  `score` int(11) NOT NULL COMMENT '评分（1-5星）',
+  `status` int(11) NOT NULL DEFAULT 0 COMMENT '评价状态（0：正常，1：删除）',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_item_id` (`item_id`) USING BTREE,
+  KEY `idx_user_id` (`user_id`) USING BTREE,
+  KEY `idx_order_id` (`order_id`) USING BTREE
+) ENGINE=InnoDB ROW_FORMAT=COMPACT COMMENT='商品评价表';
+
+-- 评价统计表
+DROP TABLE IF EXISTS `tb_comment_statistics`;
+CREATE TABLE `tb_comment_statistics` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '统计ID',
+  `item_id` bigint(20) NOT NULL COMMENT '商品ID',
+  `total_count` int(11) NOT NULL DEFAULT 0 COMMENT '总评价数',
+  `positive_count` int(11) NOT NULL DEFAULT 0 COMMENT '好评数（4-5星）',
+  `neutral_count` int(11) NOT NULL DEFAULT 0 COMMENT '中评数（3星）',
+  `negative_count` int(11) NOT NULL DEFAULT 0 COMMENT '差评数（1-2星）',
+  `average_score` double NOT NULL DEFAULT 0 COMMENT '平均评分',
+  `positive_rate` double NOT NULL DEFAULT 0 COMMENT '好评率',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `idx_item_id` (`item_id`) USING BTREE
+) ENGINE=InnoDB ROW_FORMAT=COMPACT COMMENT='商品评价统计表';
+
 
