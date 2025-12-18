@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qbk.web.mapper.CommentMapper">
+
+  <resultMap id="CommentResultMap" type="com.qbk.entity.Comment">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="item_id" jdbcType="BIGINT" property="itemId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="order_id" jdbcType="BIGINT" property="orderId" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="score" jdbcType="INTEGER" property="score" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+  <resultMap id="CommentVoResultMap" type="com.qbk.entity.vo.CommentVo">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="item_id" jdbcType="BIGINT" property="itemId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="score" jdbcType="INTEGER" property="score" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+
+  <resultMap id="CommentStatisticsResultMap" type="com.qbk.entity.CommentStatistics">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="item_id" jdbcType="BIGINT" property="itemId" />
+    <result column="total_count" jdbcType="INTEGER" property="totalCount" />
+    <result column="positive_count" jdbcType="INTEGER" property="positiveCount" />
+    <result column="neutral_count" jdbcType="INTEGER" property="neutralCount" />
+    <result column="negative_count" jdbcType="INTEGER" property="negativeCount" />
+    <result column="average_score" jdbcType="DOUBLE" property="averageScore" />
+    <result column="positive_rate" jdbcType="DOUBLE" property="positiveRate" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+  <sql id="Comment_Column_List">
+    id, item_id, user_id, order_id, content, score, status, create_time, update_time
+  </sql>
+
+  <sql id="CommentStatistics_Column_List">
+    id, item_id, total_count, positive_count, neutral_count, negative_count, average_score, positive_rate, update_time
+  </sql>
+
+  <!-- 添加评价 -->
+  <insert id="addComment" parameterType="com.qbk.entity.Comment" keyProperty="id" useGeneratedKeys="true">
+    INSERT INTO tb_comment (item_id, user_id, order_id, content, score, status, create_time, update_time)
+    VALUES (#{itemId}, #{userId}, #{orderId}, #{content}, #{score}, #{status}, #{createTime}, #{updateTime})
+  </insert>
+
+  <!-- 更新评价 -->
+  <update id="updateComment" parameterType="com.qbk.entity.Comment">
+    UPDATE tb_comment
+    <set>
+      <if test="itemId != null">item_id = #{itemId},</if>
+      <if test="userId != null">user_id = #{userId},</if>
+      <if test="orderId != null">order_id = #{orderId},</if>
+      <if test="content != null">content = #{content},</if>
+      <if test="score != null">score = #{score},</if>
+      <if test="status != null">status = #{status},</if>
+      update_time = #{updateTime}
+    </set>
+    WHERE id = #{id}
+  </update>
+
+  <!-- 根据ID删除评价 -->
+  <delete id="deleteCommentById" parameterType="java.lang.Long">
+    DELETE FROM tb_comment WHERE id = #{id}
+  </delete>
+
+  <!-- 根据ID查询评价 -->
+  <select id="getCommentById" parameterType="java.lang.Long" resultMap="CommentResultMap">
+    SELECT <include refid="Comment_Column_List" />
+    FROM tb_comment
+    WHERE id = #{id}
+  </select>
+
+  <!-- 查询评价列表 -->
+  <select id="getCommentList" parameterType="com.qbk.entity.query.CommentQuery" resultMap="CommentVoResultMap">
+    SELECT c.id, c.item_id, c.user_id, u.nick_name as username, c.content, c.score, c.create_time
+    FROM tb_comment c
+    LEFT JOIN tb_user u ON c.user_id = u.id
+    <where>
+      <if test="itemId != null">AND c.item_id = #{itemId}</if>
+      <if test="userId != null">AND c.user_id = #{userId}</if>
+      c.status = 0
+    </where>
+    <choose>
+      <when test="sortBy == 'time_desc'">ORDER BY c.create_time DESC</when>
+      <when test="sortBy == 'time_asc'">ORDER BY c.create_time ASC</when>
+      <when test="sortBy == 'score_desc'">ORDER BY c.score DESC</when>
+      <when test="sortBy == 'score_asc'">ORDER BY c.score ASC</when>
+      <otherwise>ORDER BY c.create_time DESC</otherwise>
+    </choose>
+  </select>
+
+  <!-- 查询评价总数 -->
+  <select id="getCommentCount" parameterType="com.qbk.entity.query.CommentQuery" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM tb_comment c
+    <where>
+      <if test="itemId != null">AND c.item_id = #{itemId}</if>
+      <if test="userId != null">AND c.user_id = #{userId}</if>
+      c.status = 0
+    </where>
+  </select>
+
+  <!-- 根据商品ID获取评价统计 -->
+  <select id="getCommentStatisticsByItemId" parameterType="java.lang.Long" resultMap="CommentStatisticsResultMap">
+    SELECT <include refid="CommentStatistics_Column_List" />
+    FROM tb_comment_statistics
+    WHERE item_id = #{itemId}
+  </select>
+
+  <!-- 更新商品评价统计 -->
+  <update id="updateCommentStatistics" parameterType="com.qbk.entity.CommentStatistics">
+    UPDATE tb_comment_statistics
+    SET total_count = #{totalCount},
+        positive_count = #{positiveCount},
+        neutral_count = #{neutralCount},
+        negative_count = #{negativeCount},
+        average_score = #{averageScore},
+        positive_rate = #{positiveRate},
+        update_time = #{updateTime}
+    WHERE item_id = #{itemId}
+  </update>
+
+  <!-- 添加商品评价统计 -->
+  <insert id="addCommentStatistics" parameterType="com.qbk.entity.CommentStatistics" keyProperty="id" useGeneratedKeys="true">
+    INSERT INTO tb_comment_statistics (item_id, total_count, positive_count, neutral_count, negative_count, average_score, positive_rate, update_time)
+    VALUES (#{itemId}, #{totalCount}, #{positiveCount}, #{neutralCount}, #{negativeCount}, #{averageScore}, #{positiveRate}, #{updateTime})
+  </insert>
+
+  <!-- 计算商品评价统计 -->
+  <select id="calculateCommentStatistics" parameterType="java.lang.Long" resultMap="CommentStatisticsResultMap">
+    SELECT
+      #{itemId} as item_id,
+      COUNT(*) as total_count,
+      SUM(CASE WHEN score >= 4 THEN 1 ELSE 0 END) as positive_count,
+      SUM(CASE WHEN score = 3 THEN 1 ELSE 0 END) as neutral_count,
+      SUM(CASE WHEN score <= 2 THEN 1 ELSE 0 END) as negative_count,
+      AVG(score) as average_score,
+      CASE WHEN COUNT(*) > 0 THEN SUM(CASE WHEN score >= 4 THEN 1 ELSE 0 END) / COUNT(*) ELSE 0 END as positive_rate,
+      NOW() as update_time
+    FROM tb_comment
+    WHERE item_id = #{itemId} AND status = 0
+  </select>
+
+</mapper>
