@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qbk.web.mapper.ItemCommentStatMapper">
+    <insert id="insert" parameterType="com.qbk.entity.ItemCommentStat">
+        INSERT INTO tb_item_comment_stat (item_id, total_comments, good_comments, medium_comments, bad_comments, avg_score, update_time)
+        VALUES (#{itemId}, #{totalComments}, #{goodComments}, #{mediumComments}, #{badComments}, #{avgScore}, NOW())
+    </insert>
+
+    <select id="selectByItemId" resultType="com.qbk.entity.ItemCommentStat">
+        SELECT * FROM tb_item_comment_stat
+        WHERE item_id = #{itemId}
+    </select>
+
+    <update id="update" parameterType="com.qbk.entity.ItemCommentStat">
+        UPDATE tb_item_comment_stat
+        SET total_comments = #{totalComments},
+            good_comments = #{goodComments},
+            medium_comments = #{mediumComments},
+            bad_comments = #{badComments},
+            avg_score = #{avgScore},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper>
