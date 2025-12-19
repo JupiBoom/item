@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qbk.mapper.UserNotificationPreferenceMapper">
+    <resultMap id="BaseResultMap" type="com.qbk.entity.UserNotificationPreference">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="order_status" property="orderStatus" jdbcType="INTEGER"/>
+        <result column="channel" property="channel" jdbcType="INTEGER"/>
+        <result column="is_enabled" property="isEnabled" jdbcType="BIT"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.qbk.entity.UserNotificationPreference">
+        INSERT INTO user_notification_preference (
+            user_id, order_status, channel, is_enabled, create_date, update_date
+        ) VALUES (
+            #{userId}, #{orderStatus}, #{channel}, #{isEnabled}, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.qbk.entity.UserNotificationPreference">
+        UPDATE user_notification_preference
+        SET
+            is_enabled = #{isEnabled},
+            update_date = NOW()
+        WHERE
+            id = #{id}
+    </update>
+
+    <select id="getByUserId" resultMap="BaseResultMap">
+        SELECT * FROM user_notification_preference
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="getByUserIdOrderStatusAndChannel" resultMap="BaseResultMap">
+        SELECT * FROM user_notification_preference
+        WHERE user_id = #{userId}
+          AND order_status = #{orderStatus}
+          AND channel = #{channel}
+    </select>
+</mapper>
