@@ -52,6 +52,16 @@ public class BaseResultGenerator {
     public static <T> BaseResult<T> error(T data) {
         return generate(ResultStatus.FAIL, data);
     }
+    
+    /**
+     * 失败
+     */
+    public static <T> BaseResult<T> fail(ResultStatus status) {
+        return generate(status);
+    }
+    public static <T> BaseResult<T> fail(ResultStatus status, T data) {
+        return generate(status, data);
+    }
 
 
 }

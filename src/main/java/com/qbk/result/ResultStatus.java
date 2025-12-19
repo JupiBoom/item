@@ -64,7 +64,10 @@ public enum ResultStatus {
     JWT_TOKEN_CHECK_EXCEPTION(601,"token check error"),
     REQUEST_REQUIRE_JWT_TOKEN(602,"request has no token"),
 
-    INVALID_PARAM(612,"invalid param");
+    INVALID_PARAM(612,"invalid param"),
+    PARAM_ERROR(612,"invalid param"),
+    STOCK_INSUFFICIENT(613,"库存不足"),
+    CART_ITEM_NOT_FOUND(614,"购物车商品不存在");
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultStatus.class);
 
     private int code;
