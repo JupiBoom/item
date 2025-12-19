@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qbk.web.mapper.CartMapper">
+    <resultMap id="CartResultMap" type="com.qbk.entity.Cart">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="user_id" property="userId" jdbcType="BIGINT" />
+        <result column="temp_cart_key" property="tempCartKey" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <select id="findByUserId" resultMap="CartResultMap">
+        SELECT * FROM cart WHERE user_id = #{userId}
+    </select>
+
+    <select id="findByTempCartKey" resultMap="CartResultMap">
+        SELECT * FROM cart WHERE temp_cart_key = #{tempCartKey}
+    </select>
+
+    <insert id="insert" parameterType="com.qbk.entity.Cart" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO cart (user_id, temp_cart_key, create_time, update_time)
+        VALUES (#{userId}, #{tempCartKey}, NOW(), NOW())
+    </insert>
+
+    <update id="update" parameterType="com.qbk.entity.Cart">
+        UPDATE cart
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="tempCartKey != null">temp_cart_key = #{tempCartKey},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM cart WHERE id = #{id}
+    </delete>
+</mapper>
