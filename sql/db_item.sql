@@ -95,4 +95,51 @@ INSERT INTO `tb_user_role` VALUES (1, 1);
 INSERT INTO `tb_user_role` VALUES (1, 2);
 INSERT INTO `tb_user_role` VALUES (2, 2);
 
+-- 购物车表
+DROP TABLE IF EXISTS `cart`;
+CREATE TABLE `cart` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '购物车ID',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
+  `temp_cart_key` varchar(64) DEFAULT NULL COMMENT '临时购物车标识',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_temp_cart_key` (`temp_cart_key`)
+) ENGINE=InnoDB ROW_FORMAT=COMPACT COMMENT='购物车表';
+
+-- 商品表
+DROP TABLE IF EXISTS `product`;
+CREATE TABLE `product` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '商品ID',
+  `name` varchar(100) NOT NULL COMMENT '商品名称',
+  `price` decimal(10,2) NOT NULL COMMENT '商品价格',
+  `stock` int(11) NOT NULL DEFAULT 0 COMMENT '商品库存',
+  `image` varchar(200) DEFAULT NULL COMMENT '商品图片',
+  `description` text COMMENT '商品描述',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB ROW_FORMAT=COMPACT COMMENT='商品表';
+
+-- 购物车商品项表
+DROP TABLE IF EXISTS `cart_item`;
+CREATE TABLE `cart_item` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '购物车商品项ID',
+  `cart_id` bigint(20) DEFAULT NULL COMMENT '购物车ID',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
+  `product_id` bigint(20) NOT NULL COMMENT '商品ID',
+  `product_name` varchar(100) NOT NULL COMMENT '商品名称',
+  `price` decimal(10,2) NOT NULL COMMENT '商品价格',
+  `quantity` int(11) NOT NULL DEFAULT 1 COMMENT '商品数量',
+  `stock` int(11) NOT NULL COMMENT '商品库存',
+  `image` varchar(200) DEFAULT NULL COMMENT '商品图片',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_cart_id` (`cart_id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_product_id` (`product_id`)
+) ENGINE=InnoDB ROW_FORMAT=COMPACT COMMENT='购物车商品项表';
+
 
